@@ -1,25 +1,67 @@
 import logo from './logo.svg';
 import './App.css';
 
+import { gql, useQuery, useMutation  } from '@apollo/client';
+
+const GET_BOOKS = gql`
+
+  query getBooks {
+
+    books {
+      author
+      title
+    }
+  }
+
+`;
+
+const ADD_TODO = gql`
+
+  mutation AddTodo($title: String!,$author: String!) {
+
+    addBook(title: $title,author:$author) {
+      title
+      author
+
+    }
+
+  }
+
+`;
+
+
 function App() {
+
+  const { loading, error, data } = useQuery(GET_BOOKS);
+  const [addTodo, todo] = useMutation(ADD_TODO);
+
+
+  if (loading) return 'Loading...';
+
+  if (error) return `Error! ${error.message}`;
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Docker <code>src/App.js</code> and save to reload.
+       {
+        data && data.books.map((item)=>{
+          return (
+            <p>
+          {item.author}
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+          )
+        })
+       }
+        
+        <button onClick={()=>{
+           addTodo({ variables: { title: "test",author:'sathish' } });
+        }}>Add Books</button>
       </header>
     </div>
   );
 }
+
+
+
 
 export default App;
